@@ -1,3 +1,6 @@
+# testing files
+tests/*_profile*
+
 # VS Code
 .vscode/
 
