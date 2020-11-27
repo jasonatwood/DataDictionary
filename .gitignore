@@ -1,4 +1,0 @@
-*.ipynb
-.vscode/
-Pipfile*
-__pycache__/
