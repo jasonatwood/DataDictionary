@@ -29,6 +29,9 @@ class ProfileData():
         Profile a single file
         parameter: file_path - path to the file to be profiled
         parameter: dest_path - directory for profile to be written
+        parameter: colname_chars_replace_underscore - string of invalid characters to be replaced with an underscore
+        parameter: colname_chars_replace_custom - dict of characters and their replacement value
+        parameter: colname_chars_remove - string of characters to be removed
         kwargs: pandas keyword arguments to read text files
         """
         self.source_filepath = Path(file_path)
@@ -48,6 +51,10 @@ class ProfileData():
         parameter: dest_dir - directory for profile to be written
         parameter: contain - text string used to search filename, if found the file is profiled
         parameter: not_contain - text string used to search filename, if found the file is not profiled
+        parameter: colname_chars_replace_underscore - string of invalid characters to be replaced with an underscore
+        parameter: colname_chars_replace_custom - dict of characters and their replacement value
+        parameter: colname_chars_remove - string of characters to be removed
+        kwargs: pandas keyword arguments to read text files
         """
         # add logic to process all files
         self.source_dir = Path(source_dir)
@@ -80,6 +87,9 @@ class ProfileData():
         parameter: dest_dir - directory for profile to be written        
         parameter: dataframe - a Pandas dataframe
         parameter: dataframe_name - text string used to name the profile created
+        parameter: colname_chars_replace_underscore - string of invalid characters to be replaced with an underscore
+        parameter: colname_chars_replace_custom - dict of characters and their replacement value
+        parameter: colname_chars_remove - string of characters to be removed
         """
         self.destination_dir = Path(dest_dir)
         fo = _FileObj('dataframe', dataframe=dataframe, dataframe_name=dataframe_name)

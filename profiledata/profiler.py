@@ -5,12 +5,20 @@ import logging
 import re
 
 class _FileObj:
-    def __init__(self, path_obj, dataframe=None, dataframe_name=None, **kwargs):
+    def __init__(self, path_obj, dataframe=None, dataframe_name=None, 
+    colname_chars_replace_underscore="", colname_chars_replace_custom={},
+    colname_chars_remove="", **kwargs):
         """
         Create a FileObj instance that has a single attribute, df which is a pandas dataframe
         supports xls, xlsx, csv, tsv files. Only the first worksheet in an Excel workbook
         with multiple sheets will be read.
         param: use any keyword parameters valid in pandas.read_csv()
+        parameter: dataframe - default None; a pandas DataFrame object to be profiled
+        parameter: dataframe_name - default None; a unique string for the DataFrame, will be used as the
+            filename for the dataframe profile ex. DataFrame_Name_profile.xlsx
+        parameter: colname_chars_replace_underscore - string of invalid characters to be replaced with an underscore
+        parameter: colname_chars_replace_custom - dict of characters and their replacement value
+        parameter: colname_chars_remove - string of characters to be removed
         """
         # Initialize logging
         self.log = logging.getLogger()
@@ -24,6 +32,23 @@ class _FileObj:
         self.df = None
         # df_name must be unique to create unique output filenames
         self.df_name = None
+
+        # update default replace with underscore characters with user-defined characters
+        escape_string = r'\/()[]{},.!@?:;|-^~`' + colname_chars_replace_underscore
+        self.colname_chars_replace_underscore = re.escape(escape_string) + r'\s+'
+
+        self.colname_chars_replace_custom = {'#': 'num', '$': 'usd', '%': 'pct', '&': 'and', '+': 'plus', '*': 'times',
+        '=': 'equals', '<': 'lt', '>': 'gt'}
+        # update colname_chars_replace_custom with user-defined dict
+        self.colname_chars_replace_custom.update(colname_chars_replace_custom)
+
+        # create new colname chars replace dict with properly escaped values as needed
+        self.colname_chars_replace_custom = {}
+        for key, value in colname_chars_replace_custom.items():
+            self.colname_chars_replace_custom[re.escape(key)] = value
+
+        # set attribute for characters to be removed
+        self.colname_chars_remove = colname_chars_remove
         
         # log.info('Creating FileObj')
         if path_obj == 'dataframe':
@@ -78,29 +103,8 @@ class _FileObj:
         df = pd.DataFrame(self.df.dtypes, columns=['Data Type'])
         df.index.name = 'Column Name'
         df = df.reset_index()
-        
-        # Replace unacceptable characters in column names with undercores
-        df['Clean Column Name'] = df['Column Name'].str.replace(r'[\(\[\/,\s\-:\]\)\+]+', '_', regex=True)
-        # less than, greater than
-        df['Clean Column Name'] = df['Clean Column Name'].str.replace(r'<', '_lt_', regex=True)
-        df['Clean Column Name'] = df['Clean Column Name'].str.replace(r'>', '_gt_', regex=True)
 
-        # replace multiple underscores with a single underscore
-        df['Clean Column Name'] = df['Clean Column Name'].str.replace(r'_+', '_', regex=True)
-        # remove leading and trailing underscores
-        df['Clean Column Name'] = df['Clean Column Name'].str.strip('_')
-
-        # insert underscore for column names that might be IDs and use camel case
-        df['Clean Column Name'] = df['Clean Column Name'].apply(lambda x: _modify_camel_case_id_names(x))
-        
-        """results = re.search(r'([A-Z]+[a-z])|([a-z]+[A-Z])', text)
-        for group in results.groups():
-            if group:
-                text.replace(group, group[:-1]+'_'+group[-1])
-        """
-
-        # lower case the clean column name
-        df['Clean Column Name'] = df['Clean Column Name'].str.lower()
+        df['Clean Column Name'] = self.clean_column_names(df['Column Name'])
 
         # replace obscure data type names with clear names
         replace_dict = {'datetime64[ns]': 'date/datetime', 'object':'string'}
@@ -142,6 +146,35 @@ class _FileObj:
         
         return df[['Column Name', 'Clean Column Name', 'Data Type', 'Min Length|Value/Precision', 
             'Max Length|Value/Scale', 'Potential ID Column']]
+
+
+    def clean_column_names(self, colname_series):
+        """
+        Take a pandas series of column names and apply cleansing steps
+        Returns: pandas series of cleaned column names
+        """
+
+        # Replace unacceptable characters in column names with undercores
+        colname_series_clean = colname_series.str.replace(f'[{self.colname_chars_replace_underscore}]+', '_', regex=True)
+        # replace chars with custom values
+        for char, replacement in self.colname_chars_replace_custom.items():
+            colname_series_clean = colname_series_clean.str.replace(f'{char}', f'_{replacement}_', regex=True)
+        
+        # replace multiple underscores with a single underscore
+        colname_series_clean = colname_series_clean.str.replace(r'_+', '_', regex=True)
+        # remove leading and trailing underscores
+        colname_series_clean = colname_series_clean.str.strip('_')
+
+        # insert underscore for column names that might be IDs and use camel case
+        colname_series_clean = colname_series_clean.apply(lambda x: _modify_camel_case_id_names(x))
+
+        # remove unwanted characters
+        colname_series_clean = colname_series_clean.str.replace(f'[{self.colname_chars_remove}]+', '', regex=True)
+
+        # lower case the clean column name
+        colname_series_clean = colname_series_clean.str.lower()
+
+        return colname_series_clean
     
     
     def get_text_distinct_values(self):
