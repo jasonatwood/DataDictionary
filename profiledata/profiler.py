@@ -208,10 +208,10 @@ class _FileObj:
         return pd.DataFrame({'Column Name': list(set(pk_1 + pk_2))})
 
 def _modify_camel_case_id_names(x):
-    results = re.search(r'([a-z]+ID)', x)
+    results = re.search(r'([a-z]+ID$)', x)
     if results:
         for group in results.groups():
             if group:
-                return x.replace(group, group[:-2] + '_' + group[-2:])
+                return x.replace(group, group[:-2] + '_ID')
     else:
         return x
