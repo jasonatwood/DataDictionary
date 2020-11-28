@@ -74,45 +74,74 @@ class _FileObj:
         returns: dataframe of column names and their data types
         """
         self.log.info('Retrieving Data Types')
-        
-        pat = re.compile(r"(?:[-_\s+]id|[-_\s+]code)", flags=re.IGNORECASE)
-        
+                
         df = pd.DataFrame(self.df.dtypes, columns=['Data Type'])
         df.index.name = 'Column Name'
         df = df.reset_index()
         
         # Replace unacceptable characters in column names with undercores
-        df['Clean Column Name'] = df['Column Name'].str.replace(r'([\/,\s\-:])+', '_', regex=True)
+        df['Clean Column Name'] = df['Column Name'].str.replace(r'[\(\[\/,\s\-:\]\)\+]+', '_', regex=True)
+        # less than, greater than
+        df['Clean Column Name'] = df['Clean Column Name'].str.replace(r'<', '_lt_', regex=True)
+        df['Clean Column Name'] = df['Clean Column Name'].str.replace(r'>', '_gt_', regex=True)
+
+        # replace multiple underscores with a single underscore
+        df['Clean Column Name'] = df['Clean Column Name'].str.replace(r'_+', '_', regex=True)
+        # remove leading and trailing underscores
+        df['Clean Column Name'] = df['Clean Column Name'].str.strip('_')
+
+        # insert underscore for column names that might be IDs and use camel case
+        df['Clean Column Name'] = df['Clean Column Name'].apply(lambda x: _modify_camel_case_id_names(x))
         
+        """results = re.search(r'([A-Z]+[a-z])|([a-z]+[A-Z])', text)
+        for group in results.groups():
+            if group:
+                text.replace(group, group[:-1]+'_'+group[-1])
+        """
+
+        # lower case the clean column name
+        df['Clean Column Name'] = df['Clean Column Name'].str.lower()
+
         # replace obscure data type names with clear names
         replace_dict = {'datetime64[ns]': 'date/datetime', 'object':'string'}
         df['Data Type'] = df['Data Type'].replace(to_replace=replace_dict)
             
         # identify ID columns
-        df['Potential ID Column'] = df['Column Name'].apply(lambda x: True if re.search(pat, x) else None)
+        id_col_pat = re.compile(r"(?:[-_\s]+id|[-_\s]+ID$)|(?:[a-z]+ID$)|(?:[-_\s]+code)",)
+        df['Potential ID Column'] = df['Column Name'].apply(lambda x: True if re.search(id_col_pat, x) else None)
         # set FileObj attribute "ID Columns", referenced in dim_cols below
         self.id_cols = df.loc[df['Potential ID Column'] == True, 'Column Name'].tolist()
         
-        # caclulate precision for each column by changing values in self.df to str then finding 
-        # max(len(str)) in the column
+        # find the min and max length
         for col in self.df.columns:
             if self.df[col].count() > 0:
-                col_values_precision_series = self.df[col].astype('str').str.len()
-                max_precision_value = max(col_values_precision_series)
-                min_precision_value = min(col_values_precision_series)
+                if self.df[col].dtype == 'object':
+                    col_values_precision_series = self.df[col].astype('str').str.len()
+                    max_precision_value = max(col_values_precision_series)
+                    min_precision_value = min(col_values_precision_series)
+                elif self.df[col].dtype in ['int', 'int64', 'int32']:
+                    max_precision_value = self.df[col].max()
+                    min_precision_value = self.df[col].min()
+                elif self.df[col].dtype in ['float', 'float64', 'float32']:
+                    col_values_precision_series = self.df[col].astype('str')
+                    col_values_precision_df = col_values_precision_series.str.split('.', expand=True)
+                    # precision
+                    min_precision_value = max(col_values_precision_df[0].str.len() + col_values_precision_df[1].str.len())
+                    # scale
+                    max_precision_value = max(col_values_precision_df[1].str.len())
             else:
                 min_precision_value = 0
                 max_precision_value = 0
+                df.loc[df['Column Name'] == col, 'Data Type'] = 'N/A'
                 
-            df.loc[df['Column Name'] == col, 'Min Precision'] = min_precision_value
-            df.loc[df['Column Name'] == col, 'Max Precision'] = max_precision_value
+            df.loc[df['Column Name'] == col, 'Min Length|Value/Precision'] = min_precision_value
+            df.loc[df['Column Name'] == col, 'Max Length|Value/Scale'] = max_precision_value
             # set FileObj attribute "Dim Columns"
             if self.df[col].dtype == 'object' and col not in self.id_cols:
                 self.dim_cols.append(col)
         
-        return df[['Column Name', 'Clean Column Name', 'Data Type', 'Min Precision', 'Max Precision', 
-                   'Potential ID Column']
-                ]
+        return df[['Column Name', 'Clean Column Name', 'Data Type', 'Min Length|Value/Precision', 
+            'Max Length|Value/Scale', 'Potential ID Column']]
     
     
     def get_text_distinct_values(self):
@@ -121,8 +150,9 @@ class _FileObj:
         """
         self.log.info('Retrieving Text Value Distribution')
         results_dict = {}
+        pandas_numeric_dtype_list = ['int', 'int64', 'int32', 'float', 'float64', 'float32']
         for col in self.df.columns:
-            if self.df[col].dtype in ['int', 'int64', 'int32', 'float'] and col not in self.id_cols:
+            if self.df[col].dtype in pandas_numeric_dtype_list and col not in self.id_cols:
                 results_dict[col] = pd.DataFrame(['NA for numeric columns'], columns=[col])
             else:
                 df = pd.DataFrame(self.df[col].value_counts())
@@ -176,3 +206,12 @@ class _FileObj:
                 pass
             
         return pd.DataFrame({'Column Name': list(set(pk_1 + pk_2))})
+
+def _modify_camel_case_id_names(x):
+    results = re.search(r'([a-z]+ID)', x)
+    if results:
+        for group in results.groups():
+            if group:
+                return x.replace(group, group[:-2] + '_' + group[-2:])
+    else:
+        return x
