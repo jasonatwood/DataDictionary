@@ -36,15 +36,15 @@ class _FileObj:
         # update default replace with underscore characters with user-defined characters
         escape_string = r'\/()[]{},.!@?:;|-^~`' + colname_chars_replace_underscore
         self.colname_chars_replace_underscore = re.escape(escape_string) + r'\s+'
-
-        self.colname_chars_replace_custom = {'#': 'num', '$': 'usd', '%': 'pct', '&': 'and', '+': 'plus', '*': 'times',
-        '=': 'equals', '<': 'lt', '>': 'gt'}
+        colname_chars_replace_custom_default = {'#': 'num', '$': 'usd', '%': 'pct', '&': 'and', '+': 'plus', 
+        '*': 'times', '=': 'equals', '<': 'lt', '>': 'gt'}
+        
         # update colname_chars_replace_custom with user-defined dict
-        self.colname_chars_replace_custom.update(colname_chars_replace_custom)
+        colname_chars_replace_custom_default.update(colname_chars_replace_custom)
 
         # create new colname chars replace dict with properly escaped values as needed
         self.colname_chars_replace_custom = {}
-        for key, value in colname_chars_replace_custom.items():
+        for key, value in colname_chars_replace_custom_default.items():
             self.colname_chars_replace_custom[re.escape(key)] = value
 
         # set attribute for characters to be removed
@@ -105,10 +105,6 @@ class _FileObj:
         df = df.reset_index()
 
         df['Clean Column Name'] = self.clean_column_names(df['Column Name'])
-
-        # replace obscure data type names with clear names
-        replace_dict = {'datetime64[ns]': 'date/datetime', 'object':'string'}
-        df['Data Type'] = df['Data Type'].replace(to_replace=replace_dict)
             
         # identify ID columns
         id_col_pat = re.compile(r"(?:[-_\s]+id|[-_\s]+ID$)|(?:[a-z]+ID$)|(?:[-_\s]+code)",)
@@ -116,7 +112,7 @@ class _FileObj:
         # set FileObj attribute "ID Columns", referenced in dim_cols below
         self.id_cols = df.loc[df['Potential ID Column'] == True, 'Column Name'].tolist()
         
-        # find the min and max length
+        # identify the proper data type
         for col in self.df.columns:
             if self.df[col].count() > 0:
                 if self.df[col].dtype == 'object':
@@ -133,6 +129,9 @@ class _FileObj:
                     min_precision_value = max(col_values_precision_df[0].str.len() + col_values_precision_df[1].str.len())
                     # scale
                     max_precision_value = max(col_values_precision_df[1].str.len())
+                    # check if the Data Type could be int
+                    if col_values_precision_df[1].fillna('0').astype('int').sum() == 0:
+                        df.loc[df['Column Name'] == col, 'Data Type'] = 'decimal or integer'
             else:
                 min_precision_value = 0
                 max_precision_value = 0
@@ -143,6 +142,12 @@ class _FileObj:
             # set FileObj attribute "Dim Columns"
             if self.df[col].dtype == 'object' and col not in self.id_cols:
                 self.dim_cols.append(col)
+
+        # replace obscure data type names with clear names
+        replace_dict = {'datetime64[ns]': 'date/datetime', 'object':'text', 'int': 'integer',
+        'int8': 'integer', 'int32': 'integer', 'int64': 'integer', 'float': 'decimal', 
+        'float32': 'decimal', 'float64': 'decimal',}
+        df['Data Type'] = df['Data Type'].replace(to_replace=replace_dict)
         
         return df[['Column Name', 'Clean Column Name', 'Data Type', 'Min Length|Value/Precision', 
             'Max Length|Value/Scale', 'Potential ID Column']]
@@ -159,7 +164,7 @@ class _FileObj:
         # replace chars with custom values
         for char, replacement in self.colname_chars_replace_custom.items():
             colname_series_clean = colname_series_clean.str.replace(f'{char}', f'_{replacement}_', regex=True)
-        
+
         # replace multiple underscores with a single underscore
         colname_series_clean = colname_series_clean.str.replace(r'_+', '_', regex=True)
         # remove leading and trailing underscores
@@ -169,7 +174,8 @@ class _FileObj:
         colname_series_clean = colname_series_clean.apply(lambda x: _modify_camel_case_id_names(x))
 
         # remove unwanted characters
-        colname_series_clean = colname_series_clean.str.replace(f'[{self.colname_chars_remove}]+', '', regex=True)
+        if self.colname_chars_remove != "":
+            colname_series_clean = colname_series_clean.str.replace(f'[{self.colname_chars_remove}]+', '', regex=True)
 
         # lower case the clean column name
         colname_series_clean = colname_series_clean.str.lower()
