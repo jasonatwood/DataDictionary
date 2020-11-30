@@ -107,7 +107,7 @@ class _FileObj:
         df['Clean Column Name'] = self.clean_column_names(df['Column Name'])
             
         # identify ID columns
-        id_col_pat = re.compile(r"(?:[-_\s]+id|[-_\s]+ID$)|(?:[a-z]+ID$)|(?:[-_\s]+code)",)
+        id_col_pat = re.compile(r"(?:^id$|^ID$)|(?:[-_\s]+id|[-_\s]+ID$)|(?:[a-z]+ID$)|(?:[-_\s]+code)",)
         df['Potential ID Column'] = df['Column Name'].apply(lambda x: True if re.search(id_col_pat, x) else None)
         # set FileObj attribute "ID Columns", referenced in dim_cols below
         self.id_cols = df.loc[df['Potential ID Column'] == True, 'Column Name'].tolist()
