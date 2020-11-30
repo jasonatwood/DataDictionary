@@ -130,8 +130,12 @@ class _FileObj:
                     # scale
                     max_precision_value = max(col_values_precision_df[1].str.len())
                     # check if the Data Type could be int
-                    if col_values_precision_df[1].fillna('0').astype('int64').sum() == 0:
-                        df.loc[df['Column Name'] == col, 'Data Type'] = 'decimal or integer'
+                    try:
+                        if col_values_precision_df[1].fillna('0').astype('int64').sum() == 0:
+                            df.loc[df['Column Name'] == col, 'Data Type'] = 'decimal or integer'
+                    except ValueError:
+                        # pass because this should catch INT overflow that has no negative affect on output
+                        pass
             else:
                 min_precision_value = 0
                 max_precision_value = 0
