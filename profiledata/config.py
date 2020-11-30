@@ -70,7 +70,7 @@ class ProfileData():
         self.not_contain = not_contain
         
         for item in self.source_dir.iterdir():
-            if '~$' in item.stem[:2]:
+            if '~$' in item.stem[:2] or item.name.endswith('_profile.xlsx'):
                 continue
             if item.is_file() and item.suffix != '.lnk':
                 if self.contain is not None and re.search(f'{self.contain}', item.name):
