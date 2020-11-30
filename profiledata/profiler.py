@@ -130,7 +130,7 @@ class _FileObj:
                     # scale
                     max_precision_value = max(col_values_precision_df[1].str.len())
                     # check if the Data Type could be int
-                    if col_values_precision_df[1].fillna('0').astype('int').sum() == 0:
+                    if col_values_precision_df[1].fillna('0').astype('int64').sum() == 0:
                         df.loc[df['Column Name'] == col, 'Data Type'] = 'decimal or integer'
             else:
                 min_precision_value = 0
