@@ -79,6 +79,7 @@ class _FileObj:
             self.log.warning(f'{path_obj.name} was not parsed, please check file format and kwargs')
         else:
             # log.info('Created FileObj')
+            self.df = self.df.applymap(lambda x: x.encode('unicode_escape').decode('utf-8') if isinstance(x, str) else x)
             self.id_cols = []
             self.dim_cols = []
             self.path_obj = path_obj
