@@ -144,6 +144,11 @@ class _FileObj:
                 
             df.loc[df['Column Name'] == col, 'Min Length|Value/Precision'] = min_precision_value
             df.loc[df['Column Name'] == col, 'Max Length|Value/Scale'] = max_precision_value
+
+            # check for NULL values
+            if sum(self.df[col].isna()) > 0:
+                df.loc[df['Column Name'] == col, 'Nullable'] = True
+
             # set FileObj attribute "Dim Columns"
             if self.df[col].dtype == 'object' and col not in self.id_cols:
                 self.dim_cols.append(col)
@@ -155,7 +160,7 @@ class _FileObj:
         df['Data Type'] = df['Data Type'].replace(to_replace=replace_dict)
         
         return df[['Column Name', 'Clean Column Name', 'Data Type', 'Min Length|Value/Precision', 
-            'Max Length|Value/Scale', 'Potential ID Column']]
+            'Max Length|Value/Scale', 'Potential ID Column', 'Nullable']]
 
 
     def clean_column_names(self, colname_series):
