@@ -66,4 +66,5 @@ text |
 N/A |
 
 \* N/A is assigned to fields that contain only NULL values, no data type can be suggested
+
 \*\* 'decimal or integer' is assigned to fields that may contain integer values in the source file but while processing that file NULL values were detected which Pandas converts to the float data type. Therefore with ambiguous data a loose suggestion is made.
