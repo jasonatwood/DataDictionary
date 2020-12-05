@@ -34,10 +34,10 @@ class _FileObj:
         self.df_name = None
 
         # update default replace with underscore characters with user-defined characters
-        escape_string = r'\/()[]{},.!@?:;|-^~`' + colname_chars_replace_underscore
+        escape_string = r'\/()[]{},.!?:;-^~`' + colname_chars_replace_underscore
         self.colname_chars_replace_underscore = re.escape(escape_string) + r'\s+'
         colname_chars_replace_custom_default = {'#': 'num', '$': 'usd', '%': 'pct', '&': 'and', '+': 'plus', 
-        '*': 'times', '=': 'equals', '<': 'lt', '>': 'gt'}
+        '*': 'times', '=': 'equals', '<': 'lt', '>': 'gt', '@': 'at', '|': 'or'}
         
         # update colname_chars_replace_custom with user-defined dict
         colname_chars_replace_custom_default.update(colname_chars_replace_custom)
@@ -169,6 +169,10 @@ class _FileObj:
         Returns: pandas series of cleaned column names
         """
 
+        # remove unwanted characters
+        if self.colname_chars_remove != "":
+            colname_series_clean = colname_series_clean.str.replace(f'[{self.colname_chars_remove}]+', '', regex=True)
+
         # Replace unacceptable characters in column names with undercores
         colname_series_clean = colname_series.str.replace(f'[{self.colname_chars_replace_underscore}]+', '_', regex=True)
         # replace chars with custom values
@@ -182,10 +186,6 @@ class _FileObj:
 
         # insert underscore for column names that might be IDs and use camel case
         colname_series_clean = colname_series_clean.apply(lambda x: _modify_camel_case_id_names(x))
-
-        # remove unwanted characters
-        if self.colname_chars_remove != "":
-            colname_series_clean = colname_series_clean.str.replace(f'[{self.colname_chars_remove}]+', '', regex=True)
 
         # lower case the clean column name
         colname_series_clean = colname_series_clean.str.lower()
