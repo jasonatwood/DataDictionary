@@ -1,5 +1,5 @@
 # DataProfiler
-In any data system, the introduction of new data brings questions about the contents. Discovery and documentation of a data set is critical and a lot can be learned through basic data profiling steps. This package uses the Pandas library to create a standardized output that provides insights on the contents of a sample data set. The output can provide any data architect, data engineer, business analyst or data analyst with the information they need to make effective and efficient early decisions about the value of and potential issues in a new data set.
+In any data system, the introduction of new data brings questions about the contents. Discovery and documentation of a data set is critical and a lot can be learned through basic data profiling steps. This Python package uses the Pandas library to create a standardized output that provides insights on the contents of a sample data set. The output can provide any data architect, data engineer, business analyst or data analyst with the information they need to make effective and efficient early decisions about the value of and potential issues in a new data set.
 
 ## Components of the Output
 The output is a XLSX formatted Microsoft Excel workbook with information spread across mutliple worksheets.
@@ -68,3 +68,27 @@ N/A |
 \* N/A is assigned to fields that contain only NULL values, no data type can be suggested
 
 \*\* 'decimal or integer' is assigned to fields that may contain integer values in the source file but while processing that file NULL values were detected which Pandas converts to the float data type. Therefore with ambiguous data a loose suggestion is made.
+
+### Text Value Distribution
+For each text field, a distribution is appended to this worksheet with the count of NULL values appearing at the top.
+
+### Numeric Value Distribution
+The output on this worksheet is from the Pandas DataFrame.describe() method. It shows the distribution of numeric fields and **excludes** potential ID fields.
+
+### Potential Primary Keys
+This is one of the less developed features, however can be useful to highlight fields with heterogenous data that may indicate they may be the natural key or part of the natural key for the given sample data.
+
+## Using the DataProfiler
+```python
+import profiledata
+profiler = profiledata.ProfileData()
+
+# profile a single file
+profiler.process_file('./tests/test1.csv', dest_path='./tests/',)
+
+# profile a directory of files
+
+
+# profile a Pandas DataFrame
+
+```
