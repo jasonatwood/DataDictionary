@@ -81,7 +81,7 @@ class ProfileData():
                     self._process_file(item, **kwargs)
 
         
-    def process_dataframe(self, dest_dir, dataframe=None, dataframe_name=None,):
+    def process_dataframe(self, dest_dir, dataframe=None, dataframe_name=None, **kwargs):
         """
         Profile a pandas dataframe
         parameter: dest_dir - directory for profile to be written        
