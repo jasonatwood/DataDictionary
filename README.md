@@ -37,20 +37,21 @@ When processing a dataframe, file, or directory of files, the output of both ste
 - colname_chars_replace_custom
   - Partial customization (see table 1) 
 
-Target Character(s) | Replacement Character(s) | Override with Custom Replace Parameter 
---------------------|--------------------------|---------------------------------------
-\\/()[]{},.!?:;\-^~`\\s+ | _ | No
-\# | num | Yes
-$ | usd | Yes
-% | pct | Yes
-& | and | Yes
-\| | or | Yes
-@ | at | Yes
-\+ | plus | Yes
-\* | times | Yes
-= | equals | Yes
-\< | lt | Yes
-\> | gt | Yes
+Target Character(s) | Replacement Character(s) | Affected by Custom Parameter 
+--------------------|--------------------------|------------------------------
+\\/()[]{},.!?:;\-^~`\\s+ | _ | Yes, characters can be added
+\# | num | Yes, replacement can be changed
+$ | usd | Yes, replacement can be changed
+% | pct | Yes, replacement can be changed
+& | and | Yes, replacement can be changed
+\| | or | Yes, replacement can be changed
+@ | at | Yes, replacement can be changed
+\+ | plus | Yes, replacement can be changed
+\* | times | Yes, replacement can be changed
+= | equals | Yes, replacement can be changed
+\< | lt | Yes, replacement can be changed
+\> | gt | Yes, replacement can be changed
+Custom | Custom | Yes, target and replacement characters can be added
 
 Table 1
 
@@ -84,11 +85,12 @@ import profiledata
 profiler = profiledata.ProfileData()
 
 # profile a single file
-profiler.process_file('./tests/test1.csv', dest_path='./tests/',)
+profiler.process_file('./tests/test1.csv', dest_dir='./tests/', colname_chars_remove=r'aeiou')
 
 # profile a directory of files
-
+profiler.process_directory('./tests/', dest_dir='./tests/', contain='test1', not_contain='test2')
 
 # profile a Pandas DataFrame
+profiler.process_dataframe(dest_dir='./tests/', dataframe=sample_df, dataframe_name='sample_df')
 
 ```
