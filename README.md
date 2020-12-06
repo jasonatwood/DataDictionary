@@ -1,6 +1,8 @@
 # DataProfiler
 In any data system, the introduction of new data brings questions about the contents. Discovery and documentation of a data set is critical and a lot can be learned through basic data profiling steps. This Python package uses the Pandas library to create a standardized output that provides insights on the contents of a sample data set. The output can provide any data architect, data engineer, business analyst or data analyst with the information they need to make effective and efficient early decisions about the value of and potential issues in a new data set.
 
+**Get Started!** [Sample Code](#using-dataprofiler)
+
 ## Components of the Output
 The output is a XLSX formatted Microsoft Excel workbook with information spread across mutliple worksheets.
 
