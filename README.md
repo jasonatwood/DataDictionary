@@ -1,6 +1,10 @@
 # DataProfiler
 In any data system, the introduction of new data brings questions about the contents. Discovery and documentation of a data set is critical and a lot can be learned through basic data profiling steps. This Python package uses the Pandas library to create a standardized output that provides insights on the contents of a sample data set. The output can provide any data architect, data engineer, business analyst or data analyst with the information they need to make effective and efficient early decisions about the value of and potential issues in a new data set.
 
+The file processor is able to read any text or Excel file that can be opened with Pandas. Any argument that can be passed to pandas.read_csv() or pandas.read_excel() is valid and used to direct the file processor.
+
+[ProfileData Class and Methods](#profiledata)
+
 **Get Started!** [Sample Code](#using-dataprofiler)
 
 ## Components of the Output
@@ -96,3 +100,29 @@ profiler.process_directory('./tests/', dest_dir='./tests/', contain='test1', not
 profiler.process_dataframe(dest_dir='./tests/', dataframe=sample_df, dataframe_name='sample_df')
 
 ```
+## ProfileData
+class profiledata.**ProfileData**()
+  **process_file**(file_path=*filepath*, dest_dir=*filepath*, **kwargs)
+    file_path: path to the file to be profiled
+    dest_dir: directory for profile to be written
+    **kwargs includes:
+      colname_chars_replace_underscore: string of invalid characters to be replaced with an underscore
+      colname_chars_replace_custom: dict of characters and their replacement value
+      colname_chars_remove: string of characters to be removed
+      pandas.read_csv() or pandas.read_excel() arguments
+
+  **process_directory**(source_dir=*filepath*, dest_dir=*filepath*, **kwargs)
+    source_dir: path to the file to be profiled
+    dest_dir: directory for profile to be written
+    **kwargs includes:
+      colname_chars_replace_underscore: string of invalid characters to be replaced with an underscore
+      colname_chars_replace_custom: dict of characters and their replacement value
+      colname_chars_remove: string of characters to be removed
+      pandas.read_csv() or pandas.read_excel() arguments
+
+  **process_dataframe**(dest_dir=*filepath*, dataframe=*pandas DataFrame*, dataframe_name=*string*, **kwargs)
+    dest_dir: directory for profile to be written
+    **kwargs includes:
+      colname_chars_replace_underscore: string of invalid characters to be replaced with an underscore
+      colname_chars_replace_custom: dict of characters and their replacement value
+      colname_chars_remove: string of characters to be removed
