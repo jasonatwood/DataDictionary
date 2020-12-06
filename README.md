@@ -17,9 +17,9 @@ This worksheet is a great starting point for a data catalogue or data dictionary
 - The original field name
   - Presented as the name appears in the sample file
 - A 'clean' version of the field name
-  - These values are optimized for legibility and compatibility with RDBMS standards (See Column Name Cleanup in this section)
+  - These values are optimized for legibility and compatibility with RDBMS standards (See [Column Name Cleanup](#column-name-cleanup) in this section)
 - The presumed data type
-  - Data types are simplified into text, integer, decimal, or N/A (See Data Type Detection in this section)
+  - Data types are simplified into text, integer, decimal, or N/A (See [Data Type Detection](#data-type-detection) in this section)
 - The minimum and maximum lengths for text fields
 - The minimum and maximum values for integer fields
 - The precision and scale for decimal fields
