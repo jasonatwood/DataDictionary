@@ -4,10 +4,10 @@ In any data system, the introduction of new data brings questions about the cont
 ## Components of the Output
 The output is a XLSX formatted Microsoft Excel workbook with information spread across mutliple worksheets.
 
-- Data Types
-- Text Value Distribution
-- Numeric Value Distribution
-- Potential Primary Keys
+- [Data Types](#data-types)
+- [Text Value Distribution](#numeric-value-distribution)
+- [Numeric Value Distribution](#text-value-distribution)
+- [Potential Primary Keys](#potential-primary-keys)
 
 ### Data Types
 This worksheet is a great starting point for a data catalogue or data dictionary. At a glance, this report provides:
@@ -79,7 +79,7 @@ The output on this worksheet is from the Pandas DataFrame.describe() method. It 
 ### Potential Primary Keys
 This is one of the less developed features, however can be useful to highlight fields with heterogenous data that may indicate they may be the natural key or part of the natural key for the given sample data.
 
-## Using the DataProfiler
+## Using DataProfiler
 ```python
 import profiledata
 profiler = profiledata.ProfileData()
