@@ -126,4 +126,3 @@ class profiledata.**ProfileData**()\
       colname_chars_replace_underscore: string of invalid characters to be replaced with an underscore\
       colname_chars_replace_custom: dict of characters and their replacement value\
       colname_chars_remove: string of characters to be removed\
-      s
