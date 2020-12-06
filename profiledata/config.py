@@ -24,18 +24,18 @@ class ProfileData():
         self.destination_dir = None
         
 
-    def process_file(self, file_path, dest_path, **kwargs):
+    def process_file(self, file_path, dest_dir, **kwargs):
         """
         Profile a single file
         parameter: file_path - path to the file to be profiled
-        parameter: dest_path - directory for profile to be written
+        parameter: dest_dir - directory for profile to be written
         parameter: colname_chars_replace_underscore - string of invalid characters to be replaced with an underscore
         parameter: colname_chars_replace_custom - dict of characters and their replacement value
         parameter: colname_chars_remove - string of characters to be removed
         kwargs: pandas keyword arguments to read text files
         """
         self.source_filepath = Path(file_path)
-        self.destination_dir = Path(dest_path)
+        self.destination_dir = Path(dest_dir)
         self.log.info(f'Processing {self.source_filepath.name}')
         fo = _FileObj(self.source_filepath, **kwargs)
         if fo.df is None:
@@ -44,7 +44,7 @@ class ProfileData():
             self._create_profile(fo)
 
     
-    def process_directory(self, source_dir, dest_path, contain=None, not_contain=None, **kwargs):
+    def process_directory(self, source_dir, dest_dir, contain=None, not_contain=None, **kwargs):
         """
         Profile all files in the source directory depending on use of contain and not_contain kwargs
         parameter: source_dir - directory to scan for files to profile
@@ -58,7 +58,7 @@ class ProfileData():
         """
         # add logic to process all files
         self.source_dir = Path(source_dir)
-        self.destination_dir = Path(dest_path)
+        self.destination_dir = Path(dest_dir)
         
         if contain is not None and not_contain is not None:
             raise Exception('Cannot use both "contain" and "not_contain" to process a directory')
