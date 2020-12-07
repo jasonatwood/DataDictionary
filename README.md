@@ -11,8 +11,8 @@ The file processor is able to read any text or Excel file that can be opened wit
 The output is a XLSX formatted Microsoft Excel workbook with information spread across mutliple worksheets.
 
 - [Data Types](#data-types)
-- [Text Value Distribution](#numeric-value-distribution)
-- [Numeric Value Distribution](#text-value-distribution)
+- [Text Value Distribution](#text-value-distribution)
+- [Numeric Value Distribution](#numeric-value-distribution)
 - [Potential Primary Keys](#potential-primary-keys)
 
 ### Data Types
@@ -41,7 +41,7 @@ When processing a dataframe, file, or directory of files, the output of both ste
 - colname_chars_remove
   - Full customization
 - colname_chars_replace_custom
-  - Partial customization (see table 1) 
+  - Partial customization (see Table 1) 
 
 Target Character(s) | Replacement Character(s) | Affected by Custom Parameter 
 --------------------|--------------------------|------------------------------
@@ -62,7 +62,7 @@ Custom | Custom | Yes, target and replacement characters can be added
 Table 1
 
 #### Data Type Detection
-The best source of information for data types from a data source is a physical data model or the DDL used to create the source table. More often than not, that information is either not available or takes a prohibitively long amount of time to obtain from the data owner. This feature is meant to be a helpful suggestion based on the observed records in the sample data. Data types are simplified to avoid prescriptive output.
+The best source of information for data types from a data source is a physical data model or the DDL used to create the source table. More often than not, that information is either not available or takes a prohibitively long amount of time to obtain from the data owner. This feature is meant to be a helpful suggestion based on the observed records in the sample data. Data types are simplified to avoid prescriptive output (see Table 2).
 
 Data Types in Output |
 ---------------------|
@@ -72,8 +72,9 @@ decimal or integer |
 text |
 N/A |
 
-\* N/A is assigned to fields that contain only NULL values, no data type can be suggested
+Table 2
 
+\* N/A is assigned to fields that contain only NULL values, no data type can be suggested\
 \*\* 'decimal or integer' is assigned to fields that may contain integer values in the source file but while processing that file NULL values were detected which Pandas converts to the float data type. Therefore with ambiguous data a loose suggestion is made.
 
 ### Text Value Distribution
