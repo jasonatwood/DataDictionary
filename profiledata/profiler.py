@@ -238,7 +238,7 @@ class _FileObj:
         id_cols = self.id_cols.copy()
         dim_cols = self.dim_cols.copy()
         for col in id_cols + dim_cols:
-            new_len = len(self.df.groupby(pk_1 + [col]).count())
+            new_len = len(self.df.groupby(pk_1 + [col], sort=False).count())
             if new_len > df_len:
                 df_len = new_len
                 pk_1.append(col)
@@ -249,7 +249,7 @@ class _FileObj:
         dim_cols.reverse()
         df_len = 0
         for col in id_cols + dim_cols:
-            if len(self.df.groupby(pk_2 + [col]).count()) < df_len:
+            if len(self.df.groupby(pk_2 + [col], sort=False).count()) < df_len:
                 pk_2.append(col)
             else:
                 pass
