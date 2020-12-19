@@ -79,7 +79,6 @@ class _FileObj:
             self.log.warning(f'{path_obj.name} was not parsed, please check file format and kwargs')
         else:
             # log.info('Created FileObj')
-            self.df = self.df.applymap(lambda x: x.encode('unicode_escape').decode('utf-8') if isinstance(x, str) else x)
             self.id_cols = []
             self.dim_cols = []
             self.path_obj = path_obj
@@ -115,15 +114,18 @@ class _FileObj:
         
         # identify the proper data type
         for col in self.df.columns:
+            # set string representation of pandas series dtype
+            col_dtype = str(self.df[col].dtype)
+
             if self.df[col].count() > 0:
-                if self.df[col].dtype == 'object':
+                if col_dtype in ['object', 'bool'] or 'datetime' in col_dtype:
                     col_values_precision_series = self.df[col].astype('str').str.len()
                     max_precision_value = max(col_values_precision_series)
                     min_precision_value = min(col_values_precision_series)
-                elif self.df[col].dtype in ['int', 'int64', 'int32']:
+                elif col_dtype in ['int', 'int64', 'int32']:
                     max_precision_value = self.df[col].max()
                     min_precision_value = self.df[col].min()
-                elif self.df[col].dtype in ['float', 'float64', 'float32']:
+                elif col_dtype in ['float', 'float64', 'float32']:
                     col_values_precision_series = self.df[col].astype('str')
                     col_values_precision_df = col_values_precision_series.str.split('.', expand=True)
                     # precision
@@ -137,6 +139,9 @@ class _FileObj:
                     except ValueError:
                         # pass because this should catch INT overflow that has no negative affect on output
                         pass
+                else:
+                    min_precision_value = 'dtype not supported'
+                    max_precision_value = 'dtype not supported'
             else:
                 min_precision_value = 0
                 max_precision_value = 0
@@ -210,8 +215,12 @@ class _FileObj:
                 df.index.name = col
                 df.rename(index=str, columns={col: f'{col}_counts'}, inplace=True)
                 results_dict[col] = df.reset_index()
+
+        distinct_text_values_df = pd.concat(results_dict.values(), axis=1, join='outer', sort=True)
+
+        distinct_text_values_df = replace_xml_illegal_characters(distinct_text_values_df)
         
-        return pd.concat(results_dict.values(), axis=1, join='outer', sort=True)
+        return distinct_text_values_df
     
     
     def get_numeric_value_distribution(self):
@@ -264,3 +273,14 @@ def _modify_camel_case_id_names(x):
                 return x.replace(group, group[:-2] + '_ID')
     else:
         return x
+
+
+def replace_xml_illegal_characters(df):
+    """
+    replace characters that throw ILLEGAL_CHARACTER_ERROR in openpyxl 
+    when writing to XLS(X) formats, found regex pattern in openpyxl source here: 
+    https://openpyxl.readthedocs.io/en/stable/_modules/openpyxl/cell/cell.html
+    """
+    ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
+
+    return df.replace(to_replace=ILLEGAL_CHARACTERS_RE, value='~', regex=True)
