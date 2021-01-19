@@ -194,7 +194,7 @@ class _FileObj:
         colname_series_clean = colname_series_clean.str.strip('_')
 
         # insert underscore for column names that might be IDs and use camel case
-        colname_series_clean = colname_series_clean.apply(lambda x: _modify_camel_case_id_names(x))
+        colname_series_clean = colname_series_clean.apply(lambda x: _modify_camel_case_names(x))
 
         # lower case the clean column name
         colname_series_clean = colname_series_clean.str.lower()
@@ -269,12 +269,12 @@ class _FileObj:
             
         return pd.DataFrame({'Column Name': list(set(pk_1 + pk_2))})
 
-def _modify_camel_case_id_names(x):
-    results = re.search(r'([a-z]+ID$)', x)
+def _modify_camel_case_names(x):
+    results = re.search(r'([a-z][A-Z])', x)
     if results:
         for group in results.groups():
             if group:
-                return x.replace(group, group[:-2] + '_ID')
+                return x.replace(group, group[0] + "_" group[1])
     else:
         return x
 
