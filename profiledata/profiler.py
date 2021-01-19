@@ -152,7 +152,11 @@ class _FileObj:
 
             # check for NULL values
             if sum(self.df[col].isna()) > 0:
-                df.loc[df['Column Name'] == col, 'Nullable'] = True
+                nullable_value = True
+            else:
+                nullable_value = None
+            
+            df.loc[df['Column Name'] == col, 'Nullable'] = nullable_value
 
             # set FileObj attribute "Dim Columns"
             if self.df[col].dtype == 'object' and col not in self.id_cols:
