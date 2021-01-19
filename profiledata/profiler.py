@@ -270,13 +270,11 @@ class _FileObj:
         return pd.DataFrame({'Column Name': list(set(pk_1 + pk_2))})
 
 def _modify_camel_case_names(x):
-    results = re.search(r'([a-z][A-Z])', x)
+    results = re.findall(r'([a-z][A-Z])', x)
     if results:
-        for group in results.groups():
-            if group:
-                return x.replace(group, group[0] + "_" group[1])
-    else:
-        return x
+        for match in results:
+            x = x.replace(match, "_".join(list(match)))
+    return x
 
 
 def replace_xml_illegal_characters(df):
