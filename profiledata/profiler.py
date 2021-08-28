@@ -7,7 +7,7 @@ import re
 class _FileObj:
     def __init__(self, path_obj, dataframe=None, dataframe_name=None, 
     colname_chars_replace_underscore="", colname_chars_replace_custom={},
-    colname_chars_remove="", **kwargs):
+    colname_chars_remove="", sample_data=500, **kwargs):
         """
         Create a FileObj instance that has a single attribute, df which is a pandas dataframe
         supports xls, xlsx, csv, tsv files. Only the first worksheet in an Excel workbook
@@ -49,6 +49,9 @@ class _FileObj:
 
         # set attribute for characters to be removed
         self.colname_chars_remove = colname_chars_remove
+
+        # set sample data attributes
+        self.sample_data = sample_data
         
         # log.info('Creating FileObj')
         if path_obj == 'dataframe':
@@ -180,7 +183,7 @@ class _FileObj:
 
         # remove unwanted characters
         if self.colname_chars_remove != "":
-            colname_series_clean = colname_series_clean.str.replace(f'[{self.colname_chars_remove}]+', '', regex=True)
+            colname_series_clean = colname_series.str.replace(f'[{self.colname_chars_remove}]+', '', regex=True)
 
         # Replace unacceptable characters in column names with undercores
         colname_series_clean = colname_series.str.replace(f'[{self.colname_chars_replace_underscore}]+', '_', regex=True)
@@ -268,6 +271,10 @@ class _FileObj:
                 pass
             
         return pd.DataFrame({'Column Name': list(set(pk_1 + pk_2))})
+
+    def create_sample(self):
+        if self.sample_data is not None:
+            return self.df.head(self.sample_data)
 
 def _modify_camel_case_names(x):
     results = re.findall(r'([a-z][A-Z])', x)

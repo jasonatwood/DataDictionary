@@ -19,6 +19,7 @@ class ProfileData():
         screen = logging.StreamHandler()
         screen.setFormatter(log_fmt)
         self.log.addHandler(screen)
+        self.sample_data = 500
         self.source_filepath = None
         self.source_dir = None
         self.destination_dir = None
@@ -32,6 +33,8 @@ class ProfileData():
         parameter: colname_chars_replace_underscore - string of invalid characters to be replaced with an underscore
         parameter: colname_chars_replace_custom - dict of characters and their replacement value
         parameter: colname_chars_remove - string of characters to be removed
+        parameter: sample_data - None or integer > 0; number of records to include in a sample_data sheet in output, 
+                    default is 500, disable with sample_data=None
         kwargs: pandas keyword arguments to read text files
         """
         self.source_filepath = Path(file_path)
@@ -116,6 +119,8 @@ class ProfileData():
             fo.get_text_distinct_values().to_excel(excel_writer, sheet_name='Text_Value_Dist', index=False)
             fo.get_numeric_value_distribution().to_excel(excel_writer, sheet_name='Numeric_Value_Dist', index=False)
             fo.get_primary_keys().to_excel(excel_writer, sheet_name='Potential_Primary_Keys', index=False)
+            if self.sample_data is not None:
+                fo.create_sample().to_excel(excel_writer, sheet_name='Sample_Data', index=False)
         self.log.info(f'Output File {results_file} Complete')
 
         
