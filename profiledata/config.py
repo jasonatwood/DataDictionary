@@ -19,7 +19,6 @@ class ProfileData():
         screen = logging.StreamHandler()
         screen.setFormatter(log_fmt)
         self.log.addHandler(screen)
-        self.sample_data = 500
         self.source_filepath = None
         self.source_dir = None
         self.destination_dir = None
@@ -119,7 +118,7 @@ class ProfileData():
             fo.get_text_distinct_values().to_excel(excel_writer, sheet_name='Text_Value_Dist', index=False)
             fo.get_numeric_value_distribution().to_excel(excel_writer, sheet_name='Numeric_Value_Dist', index=False)
             fo.get_primary_keys().to_excel(excel_writer, sheet_name='Potential_Primary_Keys', index=False)
-            if self.sample_data is not None:
+            if fo.sample_data is not None:
                 fo.create_sample().to_excel(excel_writer, sheet_name='Sample_Data', index=False)
         self.log.info(f'Output File {results_file} Complete')
 
