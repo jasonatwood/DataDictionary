@@ -118,7 +118,7 @@ class _FileObj:
         # identify potential PII columns
         pii_col_pat = re.compile(r'(?:last|full|first|family|given)\S*(?:name|nm)' \
                                     r'|\S*\s*(?:address|addr)|(?:e\S*\s*mail)' \
-                                    r'|(?:tel|tele)*\S*(?:phone|no)')
+                                    r'|(?:tel|tele)*\S*(?:phone|no)', re.IGNORECASE)
         df['Potential PII Column'] = df['Column Name'].apply(lambda x: True if re.search(pii_col_pat, x) else None)
         # set FileObj attribute "ID Columns", referenced in dim_cols below
         self.pii_cols = df.loc[df['Potential PII Column'] == True, 'Column Name'].tolist()
