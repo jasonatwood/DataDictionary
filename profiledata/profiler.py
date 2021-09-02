@@ -51,7 +51,10 @@ class _FileObj:
         self.colname_chars_remove = colname_chars_remove
 
         # set sample data attributes
-        self.sample_data = sample_data
+        if (isinstance(sample_data, int) and sample_data < 0) or sample_data is None:
+            self.sample_data = sample_data
+        else: 
+            raise Exception('sample_data must be an integer > 0 or None.')
         
         # log.info('Creating FileObj')
         if path_obj == 'dataframe':
