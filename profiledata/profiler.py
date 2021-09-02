@@ -115,29 +115,6 @@ class _FileObj:
         # set FileObj attribute "ID Columns", referenced in dim_cols below
         self.id_cols = df.loc[df['Potential ID Column'] == True, 'Column Name'].tolist()
 
-        # identify potential PII columns
-        pii_col_pat = re.compile(r'(?:last|full|first|family|given)\S*(?:name|nm)' \
-                                    r'|\S*\s*(?:address|addr)|(?:e\S*\s*mail)' \
-                                    r'|(?:tel|tele)*\S*(?:phone|no)', re.IGNORECASE)
-        pii_col_name_df = df['Column Name'].apply(lambda x: True if re.search(pii_col_pat, x) else None)
-        pii_col_name_cols = df.loc[pii_col_name_df.notna(), 'Column Name'].to_list()
-        
-        # look for columns containing PII not already flagged as potential PII columns
-        # columns with telephone numbers
-        remaining_columns = [col for col in df['Column Name'] if col not in pii_col_name_cols]
-        telephone_pat = re.compile(r'\d{10,13}') # re.compile(r'(?:\(*\+*\d+\-*\.*\s*\(*\d+\)*\-*\.*\s*\d+\-*\.*\s*\d+)')
-        tel_no_df = (self.df[remaining_columns].replace(to_replace=r'\D', value='', regex=True)
-                        .apply(lambda x: True if re.search(telephone_pat, str(x)) else None))
-
-        tel_no_cols = list(tel_no_df[tel_no_df.notna()].index)
-
-        pii_cols = pii_col_name_cols + tel_no_cols
-
-        df['Potential PII Column'] = df['Column Name'].apply(lambda x: True if x in pii_cols else None)
-
-        # set FileObj attribute "PII Columns", referenced in dim_cols below
-        self.pii_cols = df.loc[df['Potential PII Column'] == True, 'Column Name'].tolist()
-
         # identify the proper data type
         for col in self.df.columns:
             # set string representation of pandas series dtype
@@ -193,6 +170,55 @@ class _FileObj:
         'int8': 'integer', 'int32': 'integer', 'int64': 'integer', 'float': 'decimal', 
         'float32': 'decimal', 'float64': 'decimal',}
         df['Data Type'] = df['Data Type'].replace(to_replace=replace_dict)
+
+        # identify potential PII columns
+        pii_col_pat = re.compile(r'(?:last|full|first|family|given)\S*(?:name|nm)' \
+                                    r'|\S*\s*(?:address|addr)|(?:e\S*\s*mail)' \
+                                    r'|(?:tel|tele)*\S*(?:phone|no)', re.IGNORECASE)
+        pii_col_name_df = df['Column Name'].apply(lambda x: True if re.search(pii_col_pat, x) else None)
+        pii_col_name_cols = df.loc[pii_col_name_df.notna(), 'Column Name'].to_list()
+
+        # look for columns containing PII not already flagged as potential PII columns
+        # columns with telephone numbers
+        remaining_columns = [col for col in df['Column Name'] if col not in pii_col_name_cols]
+        telephone_pat = re.compile(r'\d{10,13}') # re.compile(r'(?:\(*\+*\d+\-*\.*\s*\(*\d+\)*\-*\.*\s*\d+\-*\.*\s*\d+)')
+        tel_no_df = (self.df[remaining_columns].replace(to_replace=r'\D', value='', regex=True)
+                        .apply(lambda x: x.astype(str).str.contains(telephone_pat, regex=True), axis=0))
+        tel_no_cols = tel_no_df.any(axis=0)
+        tel_no_cols = list(tel_no_cols[tel_no_cols].index)
+
+        pii_cols = pii_col_name_cols + tel_no_cols
+
+        # columns with email addresses
+        remaining_columns = [col for col in df['Column Name'] if col not in pii_cols]
+        email_pat = re.compile(r'(?:\S+@\S+\.\S+)')
+        email_df = self.df[remaining_columns].apply(lambda x: x.astype(str).str.contains(email_pat, regex=True), axis=0)
+        email_cols = email_df.any(axis=0)
+        email_cols = list(email_cols[email_cols].index)
+
+        # add email_cols to list of potential pii fields
+        pii_cols += email_cols
+
+        # columns with street addresses
+        remaining_columns = []
+        for col in df['Column Name']:
+            if (col not in pii_cols 
+                    and not df[(df['Column Name'] == col) & (df['Data Type'] == 'text')].empty):
+                remaining_columns.append(col)
+            
+        street_address_pat = re.compile(r'(?:\d+\s+[a-zA-Z0-9\-]+\s*[a-zA-Z0-9\-]*)')
+        street_address_df = (self.df[remaining_columns]
+                                        .apply(lambda x: x.astype(str).str.contains(street_address_pat, regex=True), axis=0))
+        street_address_cols = street_address_df.any(axis=0)
+        street_address_cols = list(street_address_cols[street_address_cols].index)
+
+        # add street_address_cols to list of potential pii fields
+        pii_cols += street_address_cols
+
+        df['Potential PII Column'] = df['Column Name'].apply(lambda x: True if x in pii_cols else None)
+
+        # set FileObj attribute "PII Columns", referenced in dim_cols below
+        self.pii_cols = df.loc[df['Potential PII Column'] == True, 'Column Name'].tolist()
         
         return df[['Column Name', 'Clean Column Name', 'Data Type', 'Min Length|Value/Precision', 
             'Max Length|Value/Scale', 'Potential ID Column', 'Potential PII Column', 'Nullable']]
