@@ -56,6 +56,8 @@ class ProfileData():
         parameter: colname_chars_replace_underscore - string of invalid characters to be replaced with an underscore
         parameter: colname_chars_replace_custom - dict of characters and their replacement value
         parameter: colname_chars_remove - string of characters to be removed
+        parameter: sample_data - None or integer > 0; number of records to include in a sample_data sheet in output, 
+                    default is 500, disable with sample_data=None
         kwargs: pandas keyword arguments to read text files
         """
         # add logic to process all files
@@ -92,6 +94,8 @@ class ProfileData():
         parameter: colname_chars_replace_underscore - string of invalid characters to be replaced with an underscore
         parameter: colname_chars_replace_custom - dict of characters and their replacement value
         parameter: colname_chars_remove - string of characters to be removed
+        parameter: sample_data - None or integer > 0; number of records to include in a sample_data sheet in output, 
+                    default is 500, disable with sample_data=None
         """
         self.destination_dir = Path(dest_dir)
         fo = _FileObj('dataframe', dataframe=dataframe, dataframe_name=dataframe_name)
