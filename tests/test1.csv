@@ -1,8 +1,8 @@
-Country ID,Country-name,rate(dollars),Start date , PersonID,status,rate>10,rate<15,amt_Paid,date_PAID,NewAmtPaid,OldDCManagerContact,FirstName,Last_name,Phone Number,Mailing Address
-1,United States,10,03/10/97,1,,0,1,5.3456678,08/01/99,1.34,manager@company.com,Javier,Ortega,5555555,123 Fake Street
-1,United States,11,05/06/02,2,,1,1,2.03,11/01/07,6.8,(555)555-5555,Jeff,Wilson,5555555,123 Fake Street
-2,Canada,9,11/12/09,3,,0,1,4.98,06/01/06,5.01,admin@warehouse.net,Paul,Samuelsson,5555555,123 Fake Street
-3,Argentina,9,10/23/18,4,,0,1,3.13,05/01/19,7,555-5555,Terry,Swayze,5555555,123 Fake Street
-4,China,15,05/03/19,5,,1,0,7.5673,04/01/20,0.95,,Steve,McDermitt,5555555,123 Fake Street
-1,United States,,06/28/10,6,,,,,,0,N/A,Johhny,Utah,5555555,123 Fake Street
-5,India,9,09/18/17,7,,0,1,6.2,05/01/18,2.36,,Doug,Dimmadome,5555555,123 Fake Street
+Country ID,Country-name,rate(dollars),Start date , PersonID,status,rate>10,rate<15,amt_Paid,date_PAID,NewAmtPaid,OldDCManagerContact,FirstName,Last_name,Phone Number,Mailing Address,EmployeeContact
+1,United States,10,03/10/97,1,,0,1,5.3456678,08/01/99,1.34,manager@company.com,Javier,Ortega,5555555,123 Fake Ave,javier@email.com
+1,United States,11,05/06/02,2,,1,1,2.03,11/01/07,6.8,(555)555-5555,Jeff,Wilson,5555555,123 Fake Street,jeff@email.com
+2,Canada,9,11/12/09,3,,0,1,4.98,06/01/06,5.01,admin@warehouse.net,Paul,Samuelsson,5555555,123 Fake Lane,paul@email.com
+3,Argentina,9,10/23/18,4,,0,1,3.13,05/01/19,7,555-5555,Terry,Swayze,5555555,123 Fake drive,terry@email.com
+4,China,15,05/03/19,5,,1,0,7.5673,04/01/20,0.95,,Steve,McDermitt,5555555,123 Fake Pkwy,steve@email.com
+1,United States,,06/28/10,6,,,,,,0,N/A,Johhny,Utah,5555555,123 Fake St,johhny@email.com
+5,India,9,09/18/17,7,,0,1,6.2,05/01/18,2.36,,Doug,Dimmadome,5555555,123 Fake Parkway,doug@email.com
