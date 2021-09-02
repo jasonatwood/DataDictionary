@@ -119,10 +119,26 @@ class _FileObj:
         pii_col_pat = re.compile(r'(?:last|full|first|family|given)\S*(?:name|nm)' \
                                     r'|\S*\s*(?:address|addr)|(?:e\S*\s*mail)' \
                                     r'|(?:tel|tele)*\S*(?:phone|no)', re.IGNORECASE)
-        df['Potential PII Column'] = df['Column Name'].apply(lambda x: True if re.search(pii_col_pat, x) else None)
-        # set FileObj attribute "ID Columns", referenced in dim_cols below
+        pii_col_name_df = df['Column Name'].apply(lambda x: True if re.search(pii_col_pat, x) else None)
+        pii_col_name_cols = df.loc[pii_col_name_df.notna(), 'Column Name'].to_list()
+        print(pii_col_name_cols)
+        # look for columns containing PII not already flagged as potential PII columns
+        # columns with telephone numbers
+        remaining_columns = [col for col in df['Column Name'] if col not in pii_col_name_cols]
+        telephone_pat = re.compile(r'\d{10,13}') # re.compile(r'(?:\(*\+*\d+\-*\.*\s*\(*\d+\)*\-*\.*\s*\d+\-*\.*\s*\d+)')
+        tel_no_df = (self.df[remaining_columns].replace(to_replace=r'\D', value='', regex=True)
+                        .apply(lambda x: True if re.search(telephone_pat, str(x)) else None))
+
+        tel_no_cols = list(tel_no_df[tel_no_df.notna()].index)
+
+        pii_cols = pii_col_name_cols + tel_no_cols
+        print(pii_col_name_cols, tel_no_cols, pii_cols)
+
+        df['Potential PII Column'] = df['Column Name'].apply(lambda x: True if x in pii_cols else None)
+
+        # set FileObj attribute "PII Columns", referenced in dim_cols below
         self.pii_cols = df.loc[df['Potential PII Column'] == True, 'Column Name'].tolist()
-        
+
         # identify the proper data type
         for col in self.df.columns:
             # set string representation of pandas series dtype
