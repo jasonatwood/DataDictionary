@@ -14,6 +14,7 @@ The output is a XLSX formatted Microsoft Excel workbook with information spread 
 - [Text Value Distribution](#text-value-distribution)
 - [Numeric Value Distribution](#numeric-value-distribution)
 - [Potential Primary Keys](#potential-primary-keys)
+- [Sample Data](#sample-data)
 
 ### Data Types
 This worksheet is a great starting point for a data catalogue or data dictionary. At a glance, this report provides:
@@ -28,7 +29,11 @@ This worksheet is a great starting point for a data catalogue or data dictionary
 - The minimum and maximum values for integer fields
 - The precision and scale for decimal fields
 - Potential ID flag
-  - If based on the pattern of the field name, make a guess to whether or not it's an ID field
+  - Based on the contents of the field name, make a guess to whether or not it's an ID field
+- Potential PII flag
+  - First, look at the contents of the field name, make a guess to whether or not it contains PII
+  - Second, look at the values in the field and make a guess to whether or not the contents contain PII
+    - If even a single value in a field is presumed to be PII, the entire field is flagged 
 - Nullable flag
   - If one or more values are found to be NULL, set to 1 or True
 
@@ -86,6 +91,9 @@ The output on this worksheet is from the Pandas DataFrame.describe() method. It 
 ### Potential Primary Keys
 This is one of the less developed features, however can be useful to highlight fields with heterogenous data that may indicate they may be the natural key or part of the natural key for the given sample data.
 
+### Sample Data
+This optional sheet takes a number of records from a file and writes them to Sample_Data.
+
 ## Using DataProfiler
 ```python
 import profiledata
@@ -110,6 +118,7 @@ dest_dir: directory for profile to be written\
 - colname_chars_replace_underscore: string of invalid characters to be replaced with an underscore
 - colname_chars_replace_custom: dict of characters and their replacement value
 - colname_chars_remove: string of characters to be removed
+- sample_data: None or integer > 0, default 500; number of records to include in a sample_data sheet in output file. If None is passed, the sheet is omitted from the output file.
 - pandas.read_csv() or pandas.read_excel() arguments
 
 **process_directory**(source_dir=*filepath*, dest_dir=*filepath*, **kwargs)\
@@ -119,6 +128,7 @@ dest_dir: directory for profile to be written\
 - colname_chars_replace_underscore: string of invalid characters to be replaced with an underscore
 - colname_chars_replace_custom: dict of characters and their replacement value
 - colname_chars_remove: string of characters to be removed
+- sample_data: None or integer > 0, default 500; number of records to include in a sample_data sheet in output file. If None is passed, the sheet is omitted from the output file.
 - pandas.read_csv() or pandas.read_excel() arguments
 
 **process_dataframe**(dest_dir=*filepath*, dataframe=*pandas DataFrame*, dataframe_name=*string*, **kwargs)\
@@ -127,3 +137,4 @@ dest_dir: directory for profile to be written\
 - colname_chars_replace_underscore: string of invalid characters to be replaced with an underscore
 - colname_chars_replace_custom: dict of characters and their replacement value
 - colname_chars_remove: string of characters to be removed
+- sample_data: None or integer > 0, default 500; number of records to include in a sample_data sheet in output file. If None is passed, the sheet is omitted from the output file.
