@@ -121,7 +121,7 @@ class _FileObj:
                                     r'|(?:tel|tele)*\S*(?:phone|no)', re.IGNORECASE)
         pii_col_name_df = df['Column Name'].apply(lambda x: True if re.search(pii_col_pat, x) else None)
         pii_col_name_cols = df.loc[pii_col_name_df.notna(), 'Column Name'].to_list()
-        print(pii_col_name_cols)
+        
         # look for columns containing PII not already flagged as potential PII columns
         # columns with telephone numbers
         remaining_columns = [col for col in df['Column Name'] if col not in pii_col_name_cols]
@@ -132,7 +132,6 @@ class _FileObj:
         tel_no_cols = list(tel_no_df[tel_no_df.notna()].index)
 
         pii_cols = pii_col_name_cols + tel_no_cols
-        print(pii_col_name_cols, tel_no_cols, pii_cols)
 
         df['Potential PII Column'] = df['Column Name'].apply(lambda x: True if x in pii_cols else None)
 
