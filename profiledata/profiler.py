@@ -282,7 +282,7 @@ class _FileObj:
 
         distinct_text_values_df = replace_xml_illegal_characters(distinct_text_values_df)
         
-        return distinct_text_values_df
+        return distinct_text_values_df.apply(lambda x: x.astype(object) if 'datetime' in x.dtype else x)
     
     
     def get_numeric_value_distribution(self):
@@ -329,7 +329,7 @@ class _FileObj:
 
     def create_sample(self):
         if self.sample_data is not None:
-            return self.df.head(self.sample_data)
+            return self.df.head(self.sample_data).apply(lambda x: x.astype(object) if 'datetime' in x.dtype else x)
 
 def _modify_camel_case_names(x):
     results = re.findall(r'([a-z][A-Z])', x)
