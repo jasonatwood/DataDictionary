@@ -118,6 +118,9 @@ class _FileObj:
         # set FileObj attribute "ID Columns", referenced in dim_cols below
         self.id_cols = df.loc[df['Potential ID Column'] == True, 'Column Name'].tolist()
 
+        # attempt explicit date transformation for object cols not automatically detected as dates
+        self.df = self.df.apply(lambda x: pd.to_datetime(x, errors='ignore') if x.dtype == object else col)
+
         # identify the proper data type
         for col in self.df.columns:
             # set string representation of pandas series dtype
