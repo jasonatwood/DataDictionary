@@ -326,7 +326,7 @@
                 "sha256:75b5e060a3417cf64f138e0bb78e58512742c57dc29db5a5058a2b1f0c10df02"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==7.27.0"
+            "version": ">=7.31.1"
         },
         "ipython-genutils": {
             "hashes": [
