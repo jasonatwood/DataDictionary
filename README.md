@@ -1,11 +1,11 @@
-# DataProfiler
+# DataDictionary
 In any data environment, the introduction of new data brings questions about the contents. Discovery and documentation is critical and a lot can be learned of a new data set through basic data profiling. This Python package reads data from a file, directory of files, or a Pandas dataframe and creates a standardized output (Excel workbook) that provides insights on each file's contents. The output can provide any data architect, data engineer, business analyst or data analyst with the information they need to make effective and efficient early decisions about the value of and potential issues in a new data set.
 
 The file processor is able to read any text or Excel file that can be opened with Pandas. Any argument that can be passed to pandas.read_csv() or pandas.read_excel() is valid and used to direct the file processor.
 
-[ProfileData Class and Methods](#profiledata)
+[DataDictionary Class and Methods](#datadictionary)
 
-**Get Started!** [Sample Code](#using-dataprofiler)
+**Get Started!** [Sample Code](#using-datadictionary)
 
 ## Components of the Output
 The output is a XLSX formatted Microsoft Excel workbook with information spread across mutliple worksheets.
@@ -94,10 +94,10 @@ This is one of the less developed features, however can be useful to highlight f
 ### Sample Data
 This optional sheet takes a number of records from a file and writes them to Sample_Data.
 
-## Using DataProfiler
+## Using DataDictionary
 ```python
-import profiledata
-profiler = profiledata.ProfileData()
+import datadictionary
+profiler = datadictionary.ProfileData()
 
 # profile a single file
 profiler.process_file('./tests/test1.csv', dest_dir='./tests/', colname_chars_remove=r'aeiou')
@@ -109,8 +109,8 @@ profiler.process_directory('./tests/', dest_dir='./tests/', contain='test1', not
 profiler.process_dataframe(dest_dir='./tests/', dataframe=sample_df, dataframe_name='sample_df')
 
 ```
-## ProfileData
-class profiledata.**ProfileData**()\
+## DataDictionary
+class datadictionary.**ProfileData**()\
 **process_file**(file_path=*filepath*, dest_dir=*filepath*, **kwargs)\
 file_path: path to the file to be profiled\
 dest_dir: directory for profile to be written\
