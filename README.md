@@ -94,7 +94,14 @@ This is one of the less developed features, however can be useful to highlight f
 ### Sample Data
 This optional sheet takes a number of records from a file and writes them to Sample_Data.
 
-## Using DataDictionary
+## Get Started
+### Installation
+```python
+pip install datadictionary
+
+```
+
+### Using DataDictionary
 ```python
 import datadictionary
 profiler = datadictionary.ProfileData()
