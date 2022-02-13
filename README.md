@@ -11,8 +11,8 @@ The file processor is able to read any text or Excel file that can be opened wit
 
 [Sample Code](#using-datadictionary)
 
-## Components of the Output
-The output is an XLSX Microsoft Excel workbook with information spread across mutliple worksheets.
+## Components of the Output File
+The output is an XLSX Microsoft Excel workbook with information spread across mutliple worksheets. Each bullet corresponds to a worksheet in the output file.
 
 - [Data Types](#data-types)
 - [Text Value Distribution](#text-value-distribution)
@@ -75,11 +75,12 @@ The best source of information for data types from a data source is a physical d
 
 Data Types in Output |
 ---------------------|
+date/datetime |
 decimal |
 integer |
-decimal or integer |
+decimal or integer** |
 text |
-N/A |
+N/A* |
 
 Table 2
 
