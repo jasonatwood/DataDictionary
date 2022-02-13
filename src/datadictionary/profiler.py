@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from pathlib import Path
 import logging
 import re
@@ -105,6 +104,9 @@ class _FileObj:
         returns: dataframe of column names and their data types
         """
         self.log.info('Retrieving Data Types')
+
+        # attempt explicit date transformation for object cols not automatically detected as dates
+        self.df = self.df.apply(lambda x: pd.to_datetime(x, errors='coerce') if str(x.dtype) == 'object' else x, axis=0)
                 
         df = pd.DataFrame(self.df.dtypes, columns=['Data Type'])
         df.index.name = 'Column Name'
@@ -117,9 +119,6 @@ class _FileObj:
         df['Potential ID Column'] = df['Column Name'].apply(lambda x: True if re.search(id_col_pat, x) else None)
         # set FileObj attribute "ID Columns", referenced in dim_cols below
         self.id_cols = df.loc[df['Potential ID Column'] == True, 'Column Name'].tolist()
-
-        # attempt explicit date transformation for object cols not automatically detected as dates
-        self.df = self.df.apply(lambda x: pd.to_datetime(x, errors='ignore') if x.dtype == object else x, axis=0)
 
         # identify the proper data type
         for col in self.df.columns:
@@ -241,7 +240,7 @@ class _FileObj:
             colname_series_clean = colname_series.str.replace(f'[{self.colname_chars_remove}]+', '', regex=True)
 
         # Replace unacceptable characters in column names with undercores
-        colname_series_clean = colname_series.str.replace(f'[{self.colname_chars_replace_underscore}]+', '_', regex=True)
+        colname_series_clean = colname_series_clean.str.replace(f'[{self.colname_chars_replace_underscore}]+', '_', regex=True)
         # replace chars with custom values
         for char, replacement in self.colname_chars_replace_custom.items():
             colname_series_clean = colname_series_clean.str.replace(f'{char}', f'_{replacement}_', regex=True)
@@ -331,7 +330,7 @@ class _FileObj:
     def create_sample(self):
         if self.sample_data is not None:
             # strip timezone from output because Excel does not support localized TZ info
-            return self.df.head(self.sample_data).apply(lambda x: x.tz_localize(None) if 'datetime' in str(x.dtype) else x)
+            return self.df.head(self.sample_data).apply(lambda x: x.dt.tz_localize(None) if 'datetime' in str(x.dtype) else x)
 
 def _modify_camel_case_names(x):
     results = re.findall(r'([a-z][A-Z])', x)
