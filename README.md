@@ -5,10 +5,14 @@ The file processor is able to read any text or Excel file that can be opened wit
 
 [DataDictionary Class and Methods](#datadictionary)
 
-**Get Started!** [Sample Code](#using-datadictionary)
+## Get Started
+
+[Install DataDictionary](#installation) 
+
+[Sample Code](#using-datadictionary)
 
 ## Components of the Output
-The output is a XLSX formatted Microsoft Excel workbook with information spread across mutliple worksheets.
+The output is an XLSX Microsoft Excel workbook with information spread across mutliple worksheets.
 
 - [Data Types](#data-types)
 - [Text Value Distribution](#text-value-distribution)
@@ -98,7 +102,6 @@ This optional sheet takes a number of records from a file and writes them to Sam
 ### Installation
 ```python
 pip install datadictionary
-
 ```
 
 ### Using DataDictionary
@@ -114,7 +117,6 @@ profiler.process_directory('./tests/', dest_dir='./tests/', contain='test1', not
 
 # profile a Pandas DataFrame
 profiler.process_dataframe(dest_dir='./tests/', dataframe=sample_df, dataframe_name='sample_df')
-
 ```
 ## DataDictionary
 class datadictionary.**ProfileData**()\
