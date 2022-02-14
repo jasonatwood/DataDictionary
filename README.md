@@ -1,4 +1,4 @@
-# DataDictionary
+# DataDictionary Overview
 In any data environment, the introduction of new data brings questions about the contents. Discovery and documentation is critical and a lot can be learned of a new data set through basic data profiling. This Python package reads data from a file, directory of files, or a Pandas dataframe and creates a standardized output (Excel workbook) that provides insights on each file's contents. The output can provide any data architect, data engineer, business analyst or data analyst with the information they need to make effective and efficient early decisions about the value of and potential issues in a new data set.
 
 The file processor is able to read any text or Excel file that can be opened with Pandas. Any argument that can be passed to pandas.read_csv() or pandas.read_excel() is valid and used to direct the file processor.
