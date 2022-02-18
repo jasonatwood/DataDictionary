@@ -31,8 +31,8 @@ class ProfileData():
         parameter: colname_chars_replace_underscore - string of invalid characters to be replaced with an underscore
         parameter: colname_chars_replace_custom - dict of characters and their replacement value
         parameter: colname_chars_remove - string of characters to be removed
-        parameter: sample_data - None or integer > 0; number of records to include in a sample_data sheet in output, 
-                    default is 500, disable with sample_data=None
+        parameter: sample_data - None or integer > 0 default is 500; number of records to include in a sample_data sheet in output, 
+            disable with sample_data=None
         parameter: interpret_date_timestamp - boolean default False, attempt to convert string fields to date or timestamp 
         parameter: interpret_date_timestamp_errors - text default "raise", options are "raise", "ignore", "coerce".
             "raise" will raise errors on values that cannot be converted, "ignore" will not raise errors and returns the 
