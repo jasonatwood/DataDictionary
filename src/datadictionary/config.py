@@ -33,6 +33,10 @@ class ProfileData():
         parameter: colname_chars_remove - string of characters to be removed
         parameter: sample_data - None or integer > 0; number of records to include in a sample_data sheet in output, 
                     default is 500, disable with sample_data=None
+        parameter: interpret_date_timestamp - boolean default False, attempt to convert string fields to date or timestamp 
+        parameter: interpret_date_timestamp_errors - text default "raise", options are "raise", "ignore", "coerce".
+            "raise" will raise errors on values that cannot be converted, "ignore" will not raise errors and returns the 
+            input data, "coerce" will return NaT values when they cannot be converted.
         kwargs: pandas keyword arguments to read text files
         """
         self.source_filepath = Path(file_path)
@@ -57,6 +61,10 @@ class ProfileData():
         parameter: colname_chars_remove - string of characters to be removed
         parameter: sample_data - None or integer > 0; number of records to include in a sample_data sheet in output, 
                     default is 500, disable with sample_data=None
+        parameter: interpret_date_timestamp - boolean default False, attempt to convert string fields to date or timestamp 
+        parameter: interpret_date_timestamp_errors - text default "raise", options are "raise", "ignore", "coerce".
+            "raise" will raise errors on values that cannot be converted, "ignore" will not raise errors and returns the 
+            input data, "coerce" will return NaT values when they cannot be converted.
         kwargs: pandas keyword arguments to read text files
         """
         # add logic to process all files
@@ -95,6 +103,10 @@ class ProfileData():
         parameter: colname_chars_remove - string of characters to be removed
         parameter: sample_data - None or integer > 0; number of records to include in a sample_data sheet in output, 
                     default is 500, disable with sample_data=None
+        parameter: interpret_date_timestamp - boolean default False, attempt to convert string fields to date or timestamp 
+        parameter: interpret_date_timestamp_errors - text default "raise", options are "raise", "ignore", "coerce".
+            "raise" will raise errors on values that cannot be converted, "ignore" will not raise errors and returns the 
+            input data, "coerce" will return NaT values when they cannot be converted.
         """
         self.destination_dir = Path(dest_dir)
         fo = _FileObj('dataframe', dataframe=dataframe, dataframe_name=dataframe_name)
@@ -116,6 +128,8 @@ class ProfileData():
             results_file = self.destination_dir / f'{fo.df_name}_profile.xlsx'
         else:
             results_file = self.destination_dir / f'{fo.path_obj.stem}_profile.xlsx'
+        # kwargs for ExcelWriter that may help with datatime formatting issues
+        # datetime_format="yyyy-mm-dd hh:mm:ss", date_format="yyyy-mm-dd"
         with pd.ExcelWriter(results_file) as excel_writer:
             fo.get_data_types().to_excel(excel_writer, sheet_name='Data_Types', index=False)
             fo.get_text_distinct_values().to_excel(excel_writer, sheet_name='Text_Value_Dist', index=False)

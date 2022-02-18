@@ -6,7 +6,8 @@ import re
 class _FileObj:
     def __init__(self, path_obj, dataframe=None, dataframe_name=None, 
     colname_chars_replace_underscore="", colname_chars_replace_custom={},
-    colname_chars_remove="", sample_data=500, **kwargs):
+    colname_chars_remove="", sample_data=500, interpret_date_timestamp=False,
+    interpret_date_timestamp_errors="raise", **kwargs):
         """
         Create a FileObj instance that has a single attribute, df which is a pandas dataframe
         supports xls, xlsx, csv, tsv files. Only the first worksheet in an Excel workbook
@@ -18,6 +19,10 @@ class _FileObj:
         parameter: colname_chars_replace_underscore - string of invalid characters to be replaced with an underscore
         parameter: colname_chars_replace_custom - dict of characters and their replacement value
         parameter: colname_chars_remove - string of characters to be removed
+        parameter: interpret_date_timestamp - boolean default False, attempt to convert string fields to date or timestamp 
+        parameter: interpret_date_timestamp_errors - text default "raise", options are "raise", "ignore", "coerce".
+            "raise" will raise errors on values that cannot be converted, "ignore" will not raise errors and returns the 
+            input data, "coerce" will return NaT values when they cannot be converted.
         """
         # Initialize logging
         self.log = logging.getLogger()
@@ -37,6 +42,15 @@ class _FileObj:
         self.colname_chars_replace_underscore = re.escape(escape_string) + r'\s+'
         colname_chars_replace_custom_default = {'#': 'num', '$': 'usd', '%': 'pct', '&': 'and', '+': 'plus', 
         '*': 'times', '=': 'equals', '<': 'lt', '>': 'gt', '@': 'at', '|': 'or'}
+        
+        # set values for interpret_date_timestamp parameters
+        if interpret_date_timestamp not in [True, False]:
+            raise Exception(f"'{interpret_date_timestamp}' is not a valid value for interpret_date_timestamp.")
+        if interpret_date_timestamp is True and interpret_date_timestamp_errors not in ["raise", "ignore", "coerce"]:
+            raise Exception(f"'{interpret_date_timestamp_errors}' is not a valid value for interpret_date_timestamp_errors.")
+        if interpret_date_timestamp in [True, False] and interpret_date_timestamp_errors in ["raise", "ignore", "coerce"]:
+            self.interpret_date_timestamp = interpret_date_timestamp
+            self.interpret_date_timestamp_errors = interpret_date_timestamp_errors
         
         # update colname_chars_replace_custom with user-defined dict
         colname_chars_replace_custom_default.update(colname_chars_replace_custom)
@@ -87,6 +101,7 @@ class _FileObj:
             self.id_cols = []
             self.dim_cols = []
             self.path_obj = path_obj
+            self.sample_data_export = self.df.copy().head(self.sample_data)
         
         
     def get_columns(self):
@@ -105,8 +120,9 @@ class _FileObj:
         """
         self.log.info('Retrieving Data Types')
 
-        # attempt explicit date transformation for object cols not automatically detected as dates
-        self.df = self.df.apply(lambda x: pd.to_datetime(x, errors='coerce') if str(x.dtype) == 'object' else x, axis=0)
+        if self.interpret_date_timestamp:
+            # attempt explicit date transformation for object cols not automatically detected as dates
+            self.df = self.df.apply(lambda x: self.convert_to_datetime(x, self.interpret_date_timestamp_errors))
                 
         df = pd.DataFrame(self.df.dtypes, columns=['Data Type'])
         df.index.name = 'Column Name'
@@ -235,7 +251,7 @@ class _FileObj:
         Returns: pandas series of cleaned column names
         """
         colname_series_clean = colname_series
-        
+
         # remove unwanted characters
         if self.colname_chars_remove != "":
             colname_series_clean = colname_series.str.replace(f'[{self.colname_chars_remove}]+', '', regex=True)
@@ -283,7 +299,8 @@ class _FileObj:
         distinct_text_values_df = replace_xml_illegal_characters(distinct_text_values_df)
         
         # strip timezone from output because Excel does not support localized TZ info
-        return distinct_text_values_df.apply(lambda x: x.dt.tz_localize(None) if 'datetime' in str(x.dtype) else x)
+        # return distinct_text_values_df.apply(lambda x: x.dt.tz_localize(None) if 'datetime' in str(x.dtype) else x)
+        return distinct_text_values_df
     
     
     def get_numeric_value_distribution(self):
@@ -331,7 +348,22 @@ class _FileObj:
     def create_sample(self):
         if self.sample_data is not None:
             # strip timezone from output because Excel does not support localized TZ info
-            return self.df.head(self.sample_data).apply(lambda x: x.dt.tz_localize(None) if 'datetime' in str(x.dtype) else x)
+            # return self.df.head(self.sample_data).apply(lambda x: x.dt.tz_localize(None) if 'datetime' in str(x.dtype) else x)
+            return self.sample_data_export
+
+    def convert_to_datetime(self, col, interpret_date_timestamp_errors):
+        if str(col.dtype) == "object":
+            try:
+                new_col = pd.to_datetime(col, errors=interpret_date_timestamp_errors, utc=False)
+            except Exception as e:
+                self.log.error(f"Failed to cast {col.name} to date/datetime - {e}")
+            # if transformation was completely destructive, reset new_col to col
+            if new_col.count() == 0:
+                new_col = col
+        else:
+            new_col = col
+                    
+        return new_col
 
 def _modify_camel_case_names(x):
     results = re.findall(r'([a-z][A-Z])', x)
