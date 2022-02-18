@@ -193,9 +193,9 @@ class _FileObj:
         df['Data Type'] = df['Data Type'].replace(to_replace=replace_dict)
 
         # identify potential PII columns
-        pii_col_pat = re.compile(r'(?:last|full|first|family|given)\S*(?:name|nm)' \
-                                    r'|\S*\s*(?:address|addr)|(?:e\S*\s*mail)' \
-                                    r'|(?:tel|tele)*\S*(?:phone|no)', re.IGNORECASE)
+        pii_col_pat = re.compile(r'(?:last|full|first|family|given)\s*\S*(?:name|nm)|' \
+                                r'\S*\s*(?:address|addr)|(?:e\S*\s*mail)|' \
+                                r'(?:tel|tele)\S*(?:phone|no)|(?:phone)', re.IGNORECASE)
         pii_col_name_df = df['Column Name'].apply(lambda x: True if re.search(pii_col_pat, x) else None)
         pii_col_name_cols = df.loc[pii_col_name_df.notna(), 'Column Name'].to_list()
 
@@ -355,10 +355,12 @@ class _FileObj:
         if str(col.dtype) == "object":
             try:
                 new_col = pd.to_datetime(col, errors=interpret_date_timestamp_errors, utc=False)
+                # if transformation was completely destructive, reset new_col to col
+                if new_col.count() == 0:
+                    new_col = col
             except Exception as e:
                 self.log.error(f"Failed to cast {col.name} to date/datetime - {e}")
-            # if transformation was completely destructive, reset new_col to col
-            if new_col.count() == 0:
+                # initialize new_col
                 new_col = col
         else:
             new_col = col
