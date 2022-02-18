@@ -129,6 +129,8 @@ dest_dir: directory for profile to be written\
 - colname_chars_replace_custom: dict of characters and their replacement value
 - colname_chars_remove: string of characters to be removed
 - sample_data: None or integer > 0, default 500; number of records to include in a sample_data sheet in output file. If None is passed, the sheet is omitted from the output file.
+- parameter: interpret_date_timestamp - boolean default False, attempt to convert string fields to date or timestamp 
+- parameter: interpret_date_timestamp_errors - text default "raise", options are "raise", "ignore", "coerce". "raise" will raise errors on values that cannot be converted, "ignore" will not raise errors and returns the input data, "coerce" will return NaT values when they cannot be converted.
 - pandas.read_csv() or pandas.read_excel() arguments
 
 **process_directory**(source_dir=*filepath*, dest_dir=*filepath*, **kwargs)\
@@ -139,6 +141,8 @@ dest_dir: directory for profile to be written\
 - colname_chars_replace_custom: dict of characters and their replacement value
 - colname_chars_remove: string of characters to be removed
 - sample_data: None or integer > 0, default 500; number of records to include in a sample_data sheet in output file. If None is passed, the sheet is omitted from the output file.
+- parameter: interpret_date_timestamp - boolean default False, attempt to convert string fields to date or timestamp 
+- parameter: interpret_date_timestamp_errors - text default "raise", options are "raise", "ignore", "coerce". "raise" will raise errors on values that cannot be converted, "ignore" will not raise errors and returns the input data, "coerce" will return NaT values when they cannot be converted.
 - pandas.read_csv() or pandas.read_excel() arguments
 
 **process_dataframe**(dest_dir=*filepath*, dataframe=*pandas DataFrame*, dataframe_name=*string*, **kwargs)\
@@ -148,3 +152,5 @@ dest_dir: directory for profile to be written\
 - colname_chars_replace_custom: dict of characters and their replacement value
 - colname_chars_remove: string of characters to be removed
 - sample_data: None or integer > 0, default 500; number of records to include in a sample_data sheet in output file. If None is passed, the sheet is omitted from the output file.
+- parameter: interpret_date_timestamp - boolean default False, attempt to convert string fields to date or timestamp 
+- parameter: interpret_date_timestamp_errors - text default "raise", options are "raise", "ignore", "coerce". "raise" will raise errors on values that cannot be converted, "ignore" will not raise errors and returns the input data, "coerce" will return NaT values when they cannot be converted.
