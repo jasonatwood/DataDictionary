@@ -234,7 +234,8 @@ class _FileObj:
         Take a pandas series of column names and apply cleansing steps
         Returns: pandas series of cleaned column names
         """
-
+        colname_series_clean = colname_series
+        
         # remove unwanted characters
         if self.colname_chars_remove != "":
             colname_series_clean = colname_series.str.replace(f'[{self.colname_chars_remove}]+', '', regex=True)
