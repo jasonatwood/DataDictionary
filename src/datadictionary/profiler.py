@@ -33,7 +33,6 @@ class _FileObj:
         screen.setFormatter(log_fmt)
         self.log.addHandler(screen)
         
-        self.df = None
         # df_name must be unique to create unique output filenames
         self.df_name = None
 
@@ -90,13 +89,11 @@ class _FileObj:
                 try:
                     self.df = pd.read_csv(path_obj, **kwargs)
                 except Exception as error:
-                    self.log.exception(error)
+                    self.log.exception(f'{path_obj.name} was not parsed, please check file format and kwargs - {error}')
         else:
             raise Exception(f'{path_obj.name} is not a file.  Please use a valid text or excel file')
             
-        if self.df is None:
-            self.log.warning(f'{path_obj.name} was not parsed, please check file format and kwargs')
-        else:
+        if self.df:
             # log.info('Created FileObj')
             self.id_cols = []
             self.dim_cols = []
