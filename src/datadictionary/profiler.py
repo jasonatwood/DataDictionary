@@ -288,10 +288,11 @@ class _FileObj:
                 results_dict[col] = pd.DataFrame(['NA for numeric columns'], columns=[col])
             else:
                 df = pd.DataFrame(self.df[col].value_counts())
+                df.rename(index=str, column={'count':f'{col}_counts'}, inplace=True)
                 df_null = pd.DataFrame({col: len(self.df[self.df[col].isna()])}, index=['NULL'])
                 df = pd.concat([df_null, df], sort=False)
                 df.index.name = col
-                df.rename(index=str, columns={col: f'{col}_counts'}, inplace=True)
+                
                 results_dict[col] = df.reset_index()
 
         distinct_text_values_df = pd.concat(results_dict.values(), axis=1, join='outer', sort=True)
