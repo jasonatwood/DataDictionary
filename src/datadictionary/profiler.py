@@ -87,13 +87,13 @@ class _FileObj:
 
             elif path_obj.suffix in ['.csv', '.tsv', '.txt']:
                 try:
-                    self.df = pd.read_csv(path_obj, **kwargs)
+                    self.df = pd.read_csv(path_obj, **kwargs) 
                 except Exception as error:
                     self.log.exception(f'{path_obj.name} was not parsed, please check file format and kwargs - {error}')
         else:
             raise Exception(f'{path_obj.name} is not a file.  Please use a valid text or excel file')
             
-        if self.df:
+        if self.df is not None:
             # log.info('Created FileObj')
             self.id_cols = []
             self.dim_cols = []
