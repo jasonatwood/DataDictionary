@@ -285,7 +285,7 @@ class _FileObj:
                 results_dict[col] = pd.DataFrame(['NA for numeric columns'], columns=[col])
             else:
                 df = pd.DataFrame(self.df[col].value_counts())
-                df.rename(index=str, column={'count':f'{col}_counts'}, inplace=True)
+                df.rename(index=str, columns={'count':f'{col}_counts'}, inplace=True)
                 df_null = pd.DataFrame({col: len(self.df[self.df[col].isna()])}, index=['NULL'])
                 df = pd.concat([df_null, df], sort=False)
                 df.index.name = col
