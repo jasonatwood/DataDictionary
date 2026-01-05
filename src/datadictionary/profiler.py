@@ -286,9 +286,9 @@ class _FileObj:
             else:
                 df = pd.DataFrame(self.df[col].value_counts())
                 df.rename(index=str, columns={'count':f'{col}_counts'}, inplace=True)
-                df_null = pd.DataFrame({col: len(self.df[self.df[col].isna()])}, index=['NULL'])
+                df_null = pd.DataFrame({f'{col}_counts': len(self.df[self.df[col].isna()])}, index=['NULL'])
                 df = pd.concat([df_null, df], sort=False)
-                df.index.name = col
+                df.index.name = col  
                 
                 results_dict[col] = df.reset_index()
 
